@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  backend-dev:
+    build:
+      context: .
+      target: dev-container
+    volumes:
+      - ./:/app/:delegated
+    working_dir: /app/src
+    user: root
+    container_name: backend
+    ports:
+      - "8080:8080"
+      # - "8888:8888"  # more port-forwarding (jupyter)
+    command: ash
+
+  backend-prod:
+    build:
+      context: .
+      target: prod-container
+    volumes:
+      - ./:/app/:delegated
+    working_dir: /app/src
+    user: root
+    container_name: backend
+    ports:
+      - "8080:8080"
+
+
+  psql:
+    image: postgres:12-alpine
+    container_name: postgres
+    hostname: psql
+    environment:
+      - POSTGRES_PASSWORD=django
+      - POSTGRES_USER=django
+    networks:
+      - default
+    ports:
+      - "0.0.0.0:5432:5432/tcp"
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    hostname: redis
+    networks:
+      - default
+    ports:
+      - "0.0.0.0:6379:6379/tcp"
